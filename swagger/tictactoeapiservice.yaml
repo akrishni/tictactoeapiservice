@@ -1,0 +1,180 @@
+swagger: '2.0'
+
+info:
+  version: "0.0.1"
+  title: TicTacToe
+
+paths:
+  /tictactoe:
+    post:
+      tags:
+        - new game
+      summary: Starts a new game of tictactoe
+      description: starts a new game of tictacktoe and returns the game object in the response
+      operationId: startNewGame
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: body
+          name: players
+          description: player to play
+          required: true
+          schema:
+            $ref: "#/definitions/Players"
+      responses:
+        "400":
+          description: Invalid input
+        "200":
+          description: Successful operation
+          schema:
+            $ref: "#/definitions/TicTacToeGame"
+  /tictactoe/{gameId}:
+    get:
+      tags:
+        - existing game
+      summary: Find the TicTackToe game by ID
+      description: Returns status of the TicTacToe game by ID
+      operationId: getGameById
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: gameId
+          description: ID of game that needs to be fetched
+          required: true
+          type: string
+          format: UUID
+      responses:
+        "404":
+          description: Game not found
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/TicTacToeGame"
+  /tictactoe/{gameId}/move:
+    put:
+      tags:
+        - new move
+      summary: send the next move by the player or if playing with computer ask the computer to make the next move
+      description: sends next move or ask computer to make the next move
+      operationId: applyNextMove
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: gameId
+          description: ID of game that needs to be fetched
+          required: true
+          type: string
+          format: UUID
+        - in: body
+          name: nextMove
+          description: next move
+          required: false
+          schema:
+            $ref: "#/definitions/Move"
+      responses:
+        "404":
+          description: Game for which the move was sent is not found
+        "400":
+          description: Invalid input 
+        "498":
+          description: Invalid move - Not player turn   
+        "499":
+          description: Invalid move - Unkown position or position already taken
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/TicTacToeGame"
+  /tictactoe/{gameId}/join:  
+    put:
+      tags:
+        - join game
+      summary: join an existing game
+      description: join 
+      operationId: joinGame
+      consumes:
+        - application/json
+      produces:
+        - application/json
+      parameters:
+        - in: path
+          name: gameId
+          description: ID of game that the player wants to join
+          required: true
+          type: string
+          format: UUID
+        - in: body
+          name: players
+          description: players to play
+          required: true
+          schema:
+            $ref: "#/definitions/Players"
+      responses:
+        "404":
+          description: Game for which the move was sent is not found
+        "422":
+          description: PlayerId already in the game 
+        "200":
+          description: successful operation
+          schema:
+            $ref: "#/definitions/TicTacToeGame"
+        
+definitions:
+  TicTacToeGame:
+    type: object
+    required:
+      - gameId
+    properties:
+      gameId:
+        description: game id
+        type: string
+        format: UUID
+      status:
+        description: string indicating the status of the game
+        type: string
+        enum: ["InProgress","WaitingForPlayers","GameOver-Winner","GameOver-Tie"]
+      gameWinner:
+        description: winner of the game
+        type: string
+      playerToPlayNext:
+        description: player to play the next turn
+        type: string
+      isPlayedWithComp:
+        description: flag to indicate if the game is played with a computer
+        type: boolean
+      gameBoard:
+        description: current state of the game board
+        type: array
+        items: 
+          type: array
+          items: 
+            type: string
+      playerNames:
+        description: names of the player/s playing the game
+        type: array
+        items: 
+          type: string       
+      gameType:
+        type: string
+  Move:
+    properties:
+      playerName:
+        type: string
+      gameMove:
+        type: string
+        enum: ["UPPERLEFT","UPPERMID","UPPERRIGHT","MIDLEFT","MIDMID","MIDRIGHT","LOWERLEFT","LOWERMID","LOWERRIGHT"]
+  Players:
+    properties:
+      playerNames:
+        type: array
+        items: 
+          type: string
+      gameType:
+        type: string
+        enum: ["MULTIPLAYER","SINGLEPLAYER"]
+          
