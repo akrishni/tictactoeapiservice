@@ -17,6 +17,7 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonValue;
 import io.swagger.annotations.ApiModelProperty;
+import io.swagger.api.util.TicTacToeStatusCode;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
@@ -109,7 +110,7 @@ public class TicTacToeGame implements Serializable {
         // initialize game board
         gameBoard = new ArrayList<ArrayList<String>>();
 
-        for (int i=0; i <3; i++){
+        for (int i = 0; i < 3; i++) {
             ArrayList<String> newList = new ArrayList<String>();
             newList.add(vacantSpotMarker);
             newList.add(vacantSpotMarker);
@@ -123,7 +124,7 @@ public class TicTacToeGame implements Serializable {
             this.status = GameStatusEnum.InProgress.toString();
         } else {
             isPlayedWithComp = false;
-            if(this.playerNames.size() == 2){
+            if (this.playerNames.size() == 2) {
                 this.status = GameStatusEnum.InProgress.toString();
             } else {
                 this.status = GameStatusEnum.WaitingForPlayers.toString();
@@ -137,7 +138,7 @@ public class TicTacToeGame implements Serializable {
         boolean result = false;
         for (int i = 0; i < gameBoard.size(); i++) {              // first iterate through the "outer list"
             for (int j = 0; j < gameBoard.get(i).size(); j++) {   // then iterate through all the "inner lists"
-                if (gameBoard.get(i).get(j) == vacantSpotMarker) {
+                if (gameBoard.get(i).get(j).equals(vacantSpotMarker)) {
                     return false; // if any spot is not taken
                 }
             }
@@ -145,19 +146,17 @@ public class TicTacToeGame implements Serializable {
         return result;
     }
 
-    public void updatePlayerTurn(){
-        if(playerToPlayNext.equalsIgnoreCase(this.playerNames.get(0))){
+    public void updatePlayerTurn() {
+        if (playerToPlayNext.equalsIgnoreCase(this.playerNames.get(0))) {
             playerToPlayNext = this.playerNames.get(1);
         } else {
             playerToPlayNext = this.playerNames.get(0);
         }
     }
 
-    public int applyMove(Move move) {
+    public TicTacToeStatusCode applyMove(Move move) {
         //TODO Clean up - error codes should not be hardcoded here
-        int success = 200;
-        int result = success;
-        int spotTakenError = 499;
+        TicTacToeStatusCode result = TicTacToeStatusCode.OK;
         String playerMakingTheMove = move.getPlayerName();
         String moveMarker = "";
 
@@ -167,155 +166,165 @@ public class TicTacToeGame implements Serializable {
             moveMarker = "1";
         }
 
-        ArrayList firstRow = gameBoard.get(0);
-        ArrayList secRow = gameBoard.get(1);
-        ArrayList thirdRow = gameBoard.get(2);
+        ArrayList<String> firstRow = gameBoard.get(0);
+        ArrayList<String> secRow = gameBoard.get(1);
+        ArrayList<String> thirdRow = gameBoard.get(2);
 
         if (move.getGameMove() == Move.GameMoveEnum.UPPERLEFT) {
-            if (((String)firstRow.get(0)).equalsIgnoreCase(vacantSpotMarker)) {
+            if (((String) firstRow.get(0)).equalsIgnoreCase(vacantSpotMarker)) {
                 firstRow.set(0, moveMarker);
             } else {
-                result = spotTakenError;
+                result = TicTacToeStatusCode.INVALID_POSITION;
             }
         }
         if (move.getGameMove() == Move.GameMoveEnum.UPPERMID) {
-            if (((String)firstRow.get(1)).equalsIgnoreCase(vacantSpotMarker)) {
+            if (((String) firstRow.get(1)).equalsIgnoreCase(vacantSpotMarker)) {
                 firstRow.set(1, moveMarker);
             } else {
-                result = spotTakenError;
+                result = TicTacToeStatusCode.INVALID_POSITION;
             }
         }
         if (move.getGameMove() == Move.GameMoveEnum.UPPERRIGHT) {
-            if (((String)firstRow.get(2)).equalsIgnoreCase(vacantSpotMarker)) {
+            if (((String) firstRow.get(2)).equalsIgnoreCase(vacantSpotMarker)) {
                 firstRow.set(2, moveMarker);
             } else {
-                result = spotTakenError;
+                result = TicTacToeStatusCode.INVALID_POSITION;
             }
         }
         if (move.getGameMove() == Move.GameMoveEnum.MIDLEFT) {
-            if (((String)secRow.get(0)).equalsIgnoreCase(vacantSpotMarker)) {
+            if (((String) secRow.get(0)).equalsIgnoreCase(vacantSpotMarker)) {
                 secRow.set(0, moveMarker);
             } else {
-                result = spotTakenError;
+                result = TicTacToeStatusCode.INVALID_POSITION;
             }
         }
         if (move.getGameMove() == Move.GameMoveEnum.MIDMID) {
-            if (((String)secRow.get(1)).equalsIgnoreCase(vacantSpotMarker)) {
+            if (((String) secRow.get(1)).equalsIgnoreCase(vacantSpotMarker)) {
                 secRow.set(1, moveMarker);
             } else {
-                result = spotTakenError;
+                result = TicTacToeStatusCode.INVALID_POSITION;
             }
         }
         if (move.getGameMove() == Move.GameMoveEnum.MIDRIGHT) {
-            if (((String)secRow.get(2)).equalsIgnoreCase(vacantSpotMarker)) {
+            if (((String) secRow.get(2)).equalsIgnoreCase(vacantSpotMarker)) {
                 secRow.set(2, moveMarker);
             } else {
-                result = spotTakenError;
+                result = TicTacToeStatusCode.INVALID_POSITION;
             }
         }
         if (move.getGameMove() == Move.GameMoveEnum.LOWERLEFT) {
-            if (((String)thirdRow.get(0)).equalsIgnoreCase(vacantSpotMarker)) {
+            if (((String) thirdRow.get(0)).equalsIgnoreCase(vacantSpotMarker)) {
                 thirdRow.set(0, moveMarker);
             } else {
-                result = spotTakenError;
+                result = TicTacToeStatusCode.INVALID_POSITION;
             }
         }
         if (move.getGameMove() == Move.GameMoveEnum.LOWERMID) {
-            if (((String)thirdRow.get(1)).equalsIgnoreCase(vacantSpotMarker)) {
+            if (((String) thirdRow.get(1)).equalsIgnoreCase(vacantSpotMarker)) {
                 thirdRow.set(1, moveMarker);
             } else {
-                result = spotTakenError;
+                result = TicTacToeStatusCode.INVALID_POSITION;
             }
         }
         if (move.getGameMove() == Move.GameMoveEnum.LOWERRIGHT) {
-            if (((String)thirdRow.get(2)).equalsIgnoreCase(vacantSpotMarker)) {
+            if (((String) thirdRow.get(2)).equalsIgnoreCase(vacantSpotMarker)) {
                 thirdRow.set(2, moveMarker);
             } else {
-                result = spotTakenError;
+                result = TicTacToeStatusCode.INVALID_POSITION;
             }
         }
-        gameBoard.set(0,firstRow);
-        gameBoard.set(1,secRow);
+        gameBoard.set(0, firstRow);
+        gameBoard.set(1, secRow);
         gameBoard.set(2, thirdRow);
-        if (result == 200) {// update the turn only if the move is successful
+        // update the turn only if the move is successful
+        if (result == TicTacToeStatusCode.OK) {
             updatePlayerTurn();
-        } else {
-            System.out.println("unsuccessfule move. result == " + result );
+            checkGameStatus();
         }
         return result;
     }
 
-    public boolean checkGameStatus(){
-        boolean gameStatusCheck = true;
-        if (this.isAllSpotsTaken()){
-            if (this.isThereWinner()){
-                this.status = GameStatusEnum.GameOverWinner.toString();
-            } else {
-                this.status = GameStatusEnum.GameOverTie.toString();
-            }
+    public void checkGameStatus() {
+        if (this.isThereWinner()) {
+            this.status = GameStatusEnum.GameOverWinner.toString();
+            return;
+        }
+        if (this.isAllSpotsTaken()) {
+            this.status = GameStatusEnum.GameOverTie.toString();
         } else {
             this.status = GameStatusEnum.InProgress.toString();
         }
-        return gameStatusCheck;
     }
 
     private boolean isThereWinner() {
         boolean result = true;
+        ArrayList<String> firstRow = gameBoard.get(0);
+        ArrayList<String> secRow = gameBoard.get(1);
+        ArrayList<String> thirdRow = gameBoard.get(2);
 
-        ArrayList firstRow = gameBoard.get(0);
-        ArrayList secRow = gameBoard.get(1);
-        ArrayList thirdRow = gameBoard.get(2);
-
-        if((firstRow.get(0) == firstRow.get(1)) && (firstRow.get(1) == firstRow.get(2))){
-            if(firstRow.get(0) == "0"){
+        if (!firstRow.get(0).equalsIgnoreCase(vacantSpotMarker) && firstRow.get(0).equalsIgnoreCase(firstRow.get(1)) && firstRow.get(1).equalsIgnoreCase(firstRow.get(2))) {
+            if (firstRow.get(0).equalsIgnoreCase("0")) {
                 gameWinner = this.playerNames.get(0);
             } else {
                 gameWinner = this.playerNames.get(1);
             }
-        }else if((secRow.get(0) == secRow.get(1)) && (secRow.get(1) == secRow.get(2))){
-            if(secRow.get(0) == "0"){
+        } else if (!secRow.get(0).equalsIgnoreCase(vacantSpotMarker) && secRow.get(0).equalsIgnoreCase(secRow.get(1)) && secRow.get(1).equalsIgnoreCase(secRow.get(2))) {
+            if (secRow.get(0).equals("0")) {
                 gameWinner = this.playerNames.get(0);
             } else {
                 gameWinner = this.playerNames.get(1);
             }
-        } else if((thirdRow.get(0) == thirdRow.get(1)) && (thirdRow.get(1) == thirdRow.get(2))){
-            if(secRow.get(0) == "0"){
+        } else if (!thirdRow.get(0).equalsIgnoreCase(vacantSpotMarker) && thirdRow.get(0).equalsIgnoreCase(thirdRow.get(1)) && thirdRow.get(1).equalsIgnoreCase(thirdRow.get(2))) {
+            if (secRow.get(0).equals("0")) {
                 gameWinner = this.playerNames.get(0);
             } else {
                 gameWinner = this.playerNames.get(1);
             }
-        } else if((firstRow.get(0) == secRow.get(0)) && (secRow.get(0) == thirdRow.get(0))){
-            if(firstRow.get(0) == "0"){
+        } else if (!firstRow.get(0).equalsIgnoreCase(vacantSpotMarker) && firstRow.get(0).equalsIgnoreCase(secRow.get(0)) && secRow.get(0).equalsIgnoreCase(thirdRow.get(0))) {
+            if (firstRow.get(0).equals("0")) {
                 gameWinner = this.playerNames.get(0);
             } else {
                 gameWinner = this.playerNames.get(1);
             }
-        } else if((firstRow.get(1) == secRow.get(1)) && (secRow.get(1) == thirdRow.get(1))){
-            if(firstRow.get(0) == "0"){
+        } else if (!firstRow.get(1).equalsIgnoreCase(vacantSpotMarker) && firstRow.get(1).equalsIgnoreCase(secRow.get(1)) && secRow.get(1).equalsIgnoreCase(thirdRow.get(1))) {
+            if (firstRow.get(0).equals("0")) {
                 gameWinner = this.playerNames.get(0);
             } else {
                 gameWinner = this.playerNames.get(1);
             }
-        } else if((firstRow.get(2) == secRow.get(2)) && (secRow.get(2) == thirdRow.get(2))){
-            if(firstRow.get(0) == "0"){
+        } else if (!firstRow.get(2).equalsIgnoreCase(vacantSpotMarker) && firstRow.get(2).equalsIgnoreCase(secRow.get(2)) && secRow.get(2).equalsIgnoreCase(thirdRow.get(2))) {
+            if (firstRow.get(0).equals("0")) {
                 gameWinner = this.playerNames.get(0);
             } else {
                 gameWinner = this.playerNames.get(1);
             }
-        } else if((firstRow.get(0) == secRow.get(1)) && (secRow.get(1) == thirdRow.get(2))){
-            if(firstRow.get(0) == "0"){
+        } else if (!firstRow.get(0).equalsIgnoreCase(vacantSpotMarker) && firstRow.get(0).equalsIgnoreCase(secRow.get(1)) && secRow.get(1).equalsIgnoreCase(thirdRow.get(2))) {
+            if (firstRow.get(0).equals("0")) {
                 gameWinner = this.playerNames.get(0);
             } else {
                 gameWinner = this.playerNames.get(1);
             }
-        } else if((firstRow.get(2) == secRow.get(1)) && (secRow.get(1) == thirdRow.get(0))){
-            if(firstRow.get(0) == "0"){
+        } else if (!firstRow.get(2).equalsIgnoreCase(vacantSpotMarker) && firstRow.get(2).equalsIgnoreCase(secRow.get(1)) && secRow.get(1).equalsIgnoreCase(thirdRow.get(0))) {
+            if (firstRow.get(0).equals("0")) {
                 gameWinner = this.playerNames.get(0);
             } else {
                 gameWinner = this.playerNames.get(1);
             }
         } else {
             result = false;
+        }
+        return result;
+    }
+
+    public TicTacToeStatusCode joinGame(Players players){
+        TicTacToeStatusCode result = TicTacToeStatusCode.OK;
+        if (players.getPlayerNames().size() != 1) {
+            result = TicTacToeStatusCode.INVALID_NUMBER_PLAYERS;
+        } else if (this.getStatus().equalsIgnoreCase(GameStatusEnum.WaitingForPlayers.toString())){
+            this.playerNames.add((String)players.getPlayerNames().get(0));
+            this.status = GameStatusEnum.InProgress.toString();
+        } else {
+            result = TicTacToeStatusCode.INVALID_JOIN;
         }
         return result;
     }
